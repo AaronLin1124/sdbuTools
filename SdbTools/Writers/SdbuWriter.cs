@@ -8,7 +8,7 @@ namespace SdbTools.Writers;
 
 public static class SdbuWriter
 {
-    private const string MagicNumber = "sbdu";
+    private const string MagicNumber = "sdbu";
     private const byte HeaderLength = 42;
     private const byte SignalBodyLength = 64;
 

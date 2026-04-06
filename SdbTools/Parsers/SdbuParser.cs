@@ -8,7 +8,7 @@ namespace SdbTools.Parsers;
 
 public static class SdbuParser
 {
-    private const string MagicNumber = "sbdu";
+    private const string MagicNumber = "sdbu";
 
     public static SdbuProject Parse(string filePath)
     {
