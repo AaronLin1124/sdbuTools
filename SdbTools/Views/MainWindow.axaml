@@ -1,0 +1,137 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:SdbTools.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="600"
+        x:Class="SdbTools.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="SDBU 串口协议工具"
+        Width="1200" Height="650"
+        MinWidth="900" MinHeight="500"
+        WindowStartupLocation="CenterScreen">
+
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="文件(_F)">
+                <MenuItem Header="新建(_N)" Command="{Binding NewProjectCommand}"/>
+                <MenuItem Header="打开(_O)" Command="{Binding OpenProjectCommand}"/>
+                <Separator/>
+                <MenuItem Header="保存(_S)" Command="{Binding SaveProjectCommand}"/>
+                <MenuItem Header="另存为(_A)" Command="{Binding SaveProjectAsCommand}"/>
+            </MenuItem>
+            <MenuItem Header="编辑(_E)">
+                <MenuItem Header="添加消息" Command="{Binding AddMessageCommand}"/>
+                <MenuItem Header="添加信号" Command="{Binding AddSignalCommand}"/>
+            </MenuItem>
+            <MenuItem Header="帮助(_H)">
+                <MenuItem Header="关于" Command="{Binding ShowAboutCommand}"/>
+            </MenuItem>
+        </Menu>
+
+        <Grid RowDefinitions="*,Auto">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,*" Margin="10">
+                <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2" Margin="0,0,5,0" BorderBrush="Gray" BorderThickness="1">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+                            <Button Content="+ 新增" Command="{Binding AddMessageCommand}" Width="70" Margin="0,0,5,0"/>
+                            <Button Content="- 删除" Command="{Binding DeleteMessageCommand}" Width="70" Margin="0,0,5,0"/>
+                            <Button Content="✎ 编辑" Command="{Binding EditMessageCommand}" Width="70"/>
+                        </StackPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="消息列表" FontWeight="Bold" Margin="5,5,5,0"/>
+                        <ListBox Name="MessageList" ItemsSource="{Binding Messages}" SelectedItem="{Binding SelectedMessage}" Margin="5">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="0x" Foreground="Blue"/>
+                                        <TextBlock Text="{Binding MessageId, StringFormat={}{0:X}}" Foreground="Blue" Width="60"/>
+                                        <TextBlock Text=" - " Foreground="Gray"/>
+                                        <TextBlock Text="{Binding Name}" Width="150"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+
+                <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2" Margin="5,0,0,0" BorderBrush="Gray" BorderThickness="1">
+                    <DockPanel>
+                        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="5">
+                            <Button Content="+ 新增" Command="{Binding AddSignalCommand}" Width="70" Margin="0,0,5,0"/>
+                            <Button Content="- 删除" Command="{Binding DeleteSignalCommand}" Width="70" Margin="0,0,5,0"/>
+                            <Button Content="✎ 编辑" Command="{Binding EditSignalCommand}" Width="70"/>
+                        </StackPanel>
+                        <TextBlock DockPanel.Dock="Top" Text="信号列表" FontWeight="Bold" Margin="5,5,5,0"/>
+                        <ListBox Name="SignalList" ItemsSource="{Binding Signals}" SelectedItem="{Binding SelectedSignal}" Margin="5">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Name}" Width="120"/>
+                                        <TextBlock Text=" [" Foreground="Gray"/>
+                                        <TextBlock Text="{Binding StartBit}" Foreground="Green"/>
+                                        <TextBlock Text="-" Foreground="Gray"/>
+                                        <TextBlock Text="{Binding Length}" Foreground="Green"/>
+                                        <TextBlock Text="]" Foreground="Gray"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </DockPanel>
+                </Border>
+            </Grid>
+
+            <TabControl Grid.Row="1" Margin="10,0,10,10">
+                <TabItem Header="协议配置">
+                    <StackPanel Orientation="Horizontal" Margin="10">
+                        <Button Content="配置协议" Command="{Binding EditProtocolCommand}" Width="100" Height="30"/>
+                        <TextBlock Text="{Binding ProtocolConfigText}" VerticalAlignment="Center" Margin="10,0,0,0"/>
+                    </StackPanel>
+                </TabItem>
+                <TabItem Header="消息属性">
+                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="10" IsVisible="{Binding SelectedMessage, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="MessageId:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedMessage.MessageId}" Width="100" Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="DLC:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedMessage.MessageDlc}" Width="80" Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="名称:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="0" Grid.Column="5" Text="{Binding SelectedMessage.Name}" Width="150" Margin="0,0,0,5"/>
+                        <Button Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="6" Content="保存消息" Command="{Binding SaveMessageChangesCommand}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </Grid>
+                </TabItem>
+                <TabItem Header="信号属性">
+                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" Margin="10" IsVisible="{Binding SelectedSignal, Converter={x:Static ObjectConverters.IsNotNull}}">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="信号名:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedSignal.Name}" Width="200" Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="起始位:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedSignal.StartBit}" Width="80" Margin="0,0,0,5"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="长度:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedSignal.Length}" Width="80" Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="精度:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedSignal.Factor}" Width="100" Margin="0,0,0,5"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="偏移:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedSignal.Offset}" Width="100" Margin="0,0,20,5"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="单位:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedSignal.Unit}" Width="100" Margin="0,0,0,5"/>
+
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="字节序:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <ComboBox Grid.Row="3" Grid.Column="1" SelectedIndex="{Binding ByteOrderIndex}" Width="120" Margin="0,0,20,5">
+                            <ComboBoxItem Content="Motorola"/>
+                            <ComboBoxItem Content="Intel"/>
+                        </ComboBox>
+                        <TextBlock Grid.Row="3" Grid.Column="2" Text="值类型:" VerticalAlignment="Center" Margin="0,0,10,5"/>
+                        <ComboBox Grid.Row="3" Grid.Column="3" SelectedIndex="{Binding ValueTypeIndex}" Width="120">
+                            <ComboBoxItem Content="unsigned"/>
+                            <ComboBoxItem Content="signed"/>
+                            <ComboBoxItem Content="IEEE float"/>
+                            <ComboBoxItem Content="IEEE double"/>
+                        </ComboBox>
+
+                        <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4" Content="保存修改" Command="{Binding SaveSignalChangesCommand}" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                    </Grid>
+                </TabItem>
+            </TabControl>
+        </Grid>
+    </DockPanel>
+</Window>
