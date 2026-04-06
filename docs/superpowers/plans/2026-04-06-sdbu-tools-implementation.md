@@ -133,7 +133,7 @@ public class SdbuProject
 ```csharp
 public static class SdbuWriter
 {
-    private const string MagicNumber = "sbdu";
+    private const string MagicNumber = "sdbu";
     
     public static void Write(string outputPath, SdbuProject project)
     {
