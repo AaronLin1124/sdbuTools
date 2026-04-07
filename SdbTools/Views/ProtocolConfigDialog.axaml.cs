@@ -191,12 +191,8 @@ public partial class ProtocolConfigDialog : Window
             var selectedItem = (ComboBoxItem?)combo.SelectedItem;
             if (selectedItem?.Tag != null) fieldType = (int)selectedItem.Tag;
             
-            _lengthBoxes[i].TextChanging -= OnLengthTextChanging;
-            if (fieldType == 1 || fieldType == 9)
-            {
-                _lengthBoxes[i].Watermark = "最大4";
-            }
-            else if (fieldType == 8)
+            _lengthBoxes[i].LostFocus -= OnLengthLostFocus;
+            if (fieldType == 1 || fieldType == 9 || fieldType == 8)
             {
                 _lengthBoxes[i].Watermark = "最大4";
             }
@@ -204,25 +200,18 @@ public partial class ProtocolConfigDialog : Window
             {
                 _lengthBoxes[i].Watermark = "";
             }
-            _lengthBoxes[i].TextChanging += OnLengthTextChanging;
+            _lengthBoxes[i].LostFocus += OnLengthLostFocus;
         }
     }
 
-    private void OnLengthTextChanging(object? sender, TextChangingEventArgs e)
+    private void OnLengthLostFocus(object? sender, RoutedEventArgs e)
     {
         var textBox = sender as TextBox;
         if (textBox == null) return;
 
-        int i = (int)textBox.Tag!;
-        int fieldType = 0;
-        var combo = _typeCombos[i];
-        var selectedItem = (ComboBoxItem?)combo.SelectedItem;
-        if (selectedItem?.Tag != null) fieldType = (int)selectedItem.Tag;
-
-        int maxLen = 4;
-        if (textBox.Text != null && textBox.Text.Length > maxLen)
+        if (int.TryParse(textBox.Text, out var val) && val > 4)
         {
-            textBox.Text = textBox.Text.Substring(0, maxLen);
+            textBox.Text = "4";
         }
     }
 
