@@ -46,6 +46,22 @@ public partial class ProtocolConfigDialog : Window
         
         var config = Project.Protocol.ProtocolConfig;
         
+        int fieldCount = 0;
+        for (int i = 0; i < 16; i++)
+        {
+            int pos = i * 2;
+            if (pos >= config.Length) break;
+            
+            byte b = config[pos];
+            int fieldType = (b >> 4) & 0x0F;
+            if (fieldType > 0) fieldCount = i + 1;
+        }
+
+        while (_fieldCount < fieldCount)
+        {
+            AddFieldUI();
+        }
+
         for (int i = 0; i < _fieldCount; i++)
         {
             int pos = i * 2;
@@ -81,6 +97,8 @@ public partial class ProtocolConfigDialog : Window
         {
             _footerMagicBox!.Text = BytesToHexString(Project.Protocol.FooterMagic);
         }
+        
+        UpdateCheckBoxes();
     }
 
     private string BytesToHexString(byte[] bytes)
@@ -293,8 +311,13 @@ public partial class ProtocolConfigDialog : Window
     {
         if (_fieldCount >= 16) return;
         
-        int i = _fieldCount;
         _fieldCount++;
+        AddFieldUI();
+    }
+
+    private void AddFieldUI()
+    {
+        int i = _fieldCount - 1;
 
         ComboBox combo;
         TextBox lengthBox;
