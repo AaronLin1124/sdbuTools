@@ -45,7 +45,12 @@ public static class SdbuParser
 
             if (!signalDict.TryGetValue(sig.MessageId, out var msg))
             {
-                msg = new SdbuMessage { MessageId = sig.MessageId, MessageDlc = sig.MessageDlc };
+                msg = new SdbuMessage 
+                { 
+                    MessageId = sig.MessageId, 
+                    MessageDlc = sig.MessageDlc,
+                    Name = sig.MessageName 
+                };
                 signalDict[sig.MessageId] = msg;
                 project.Messages.Add(msg);
             }
@@ -61,7 +66,8 @@ public static class SdbuParser
         {
             MessageId = BitConverter.ToUInt32(data, offset),
             MessageDlc = data[offset + 4],
-            Name = ReadString(data, offset + 5, 32)
+            Name = ReadString(data, offset + 5, 16),
+            MessageName = ReadString(data, offset + 21, 16)
         };
 
         ushort packed = BitConverter.ToUInt16(data, offset + 37);
@@ -71,8 +77,8 @@ public static class SdbuParser
 
         sig.Factor = BitConverter.ToDouble(data, offset + 39);
         sig.Offset = BitConverter.ToDouble(data, offset + 47);
-        sig.Unit = ReadString(data, offset + 55, 16);
-        sig.ValueType = (ValueTypeEnum)(data[offset + 71] & 0x0F);
+        sig.Unit = ReadString(data, offset + 55, 8);
+        sig.ValueType = (ValueTypeEnum)(data[offset + 63] & 0x0F);
 
         return sig;
     }

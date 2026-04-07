@@ -10,7 +10,7 @@ public static class SdbuWriter
 {
     private const string MagicNumber = "sdbu";
     private const byte HeaderLength = 42;
-    private const byte SignalBodyLength = 64;
+    private const byte SignalBodyLength = 48;
 
     public static void Write(string outputPath, SdbuProject project)
     {
@@ -36,17 +36,17 @@ public static class SdbuWriter
             {
                 bw.Write(sig.MessageId);
                 bw.Write(msg.MessageDlc);
-                WriteString(bw, sig.Name, 32);
+                WriteString(bw, sig.Name, 16);
+                WriteString(bw, sig.MessageName, 16);
                 ushort packed = (ushort)((sig.Length << 9) | (sig.StartBit & 0x1FF));
                 if (sig.ByteOrder == ByteOrderEnum.Intel) packed |= 0x8000;
                 bw.Write(packed);
                 bw.Write(sig.Factor);
                 bw.Write(sig.Offset);
-                WriteString(bw, sig.Unit, 16);
+                WriteString(bw, sig.Unit, 8);
                 byte flags = (byte)sig.ValueType;
                 bw.Write(flags);
                 bw.Write((byte)0);
-                bw.Write((ushort)0);
             }
         }
 

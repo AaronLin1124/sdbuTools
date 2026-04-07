@@ -58,6 +58,7 @@ public class SdbuSignal
     public ByteOrderEnum ByteOrder { get; set; } = ByteOrderEnum.Intel;
     public ValueTypeEnum ValueType { get; set; } = ValueTypeEnum.Unsigned;
     public string Name { get; set; } = string.Empty;
+    public string MessageName { get; set; } = string.Empty;
     
     public byte MessageDlc { get; set; }
 }
