@@ -209,9 +209,18 @@ public partial class ProtocolConfigDialog : Window
         var textBox = sender as TextBox;
         if (textBox == null) return;
 
-        if (int.TryParse(textBox.Text, out var val) && val > 4)
+        int i = (int)textBox.Tag!;
+        int fieldType = 0;
+        var combo = _typeCombos[i];
+        var selectedItem = (ComboBoxItem?)combo.SelectedItem;
+        if (selectedItem?.Tag != null) fieldType = (int)selectedItem.Tag;
+
+        if (fieldType == 1 || fieldType == 9 || fieldType == 8)
         {
-            textBox.Text = "4";
+            if (int.TryParse(textBox.Text, out var val) && val > 4)
+            {
+                textBox.Text = "4";
+            }
         }
     }
 
