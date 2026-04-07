@@ -166,6 +166,8 @@ public partial class ProtocolConfigDialog : Window
     {
         int checkSumPos = -1;
         int lengthPos = -1;
+        int headerPos = -1;
+        int footerPos = -1;
 
         for (int i = 0; i < _fieldCount; i++)
         {
@@ -175,12 +177,52 @@ public partial class ProtocolConfigDialog : Window
 
             if (fieldType == 8) checkSumPos = i;
             if (fieldType == 6) lengthPos = i;
+            if (fieldType == 1) headerPos = i;
+            if (fieldType == 9) footerPos = i;
         }
 
         for (int i = 0; i < _fieldCount; i++)
         {
             _checkSumChecks[i].IsEnabled = (checkSumPos < 0) || (i < checkSumPos);
             _inLengthChecks[i].IsEnabled = (lengthPos < 0) || (i > lengthPos);
+            
+            int fieldType = 0;
+            var combo = _typeCombos[i];
+            var selectedItem = (ComboBoxItem?)combo.SelectedItem;
+            if (selectedItem?.Tag != null) fieldType = (int)selectedItem.Tag;
+            
+            _lengthBoxes[i].TextChanging -= OnLengthTextChanging;
+            if (fieldType == 1 || fieldType == 9)
+            {
+                _lengthBoxes[i].Watermark = "最大4";
+            }
+            else if (fieldType == 8)
+            {
+                _lengthBoxes[i].Watermark = "最大4";
+            }
+            else
+            {
+                _lengthBoxes[i].Watermark = "";
+            }
+            _lengthBoxes[i].TextChanging += OnLengthTextChanging;
+        }
+    }
+
+    private void OnLengthTextChanging(object? sender, TextChangingEventArgs e)
+    {
+        var textBox = sender as TextBox;
+        if (textBox == null) return;
+
+        int i = (int)textBox.Tag!;
+        int fieldType = 0;
+        var combo = _typeCombos[i];
+        var selectedItem = (ComboBoxItem?)combo.SelectedItem;
+        if (selectedItem?.Tag != null) fieldType = (int)selectedItem.Tag;
+
+        int maxLen = 4;
+        if (textBox.Text != null && textBox.Text.Length > maxLen)
+        {
+            textBox.Text = textBox.Text.Substring(0, maxLen);
         }
     }
 
