@@ -9,8 +9,8 @@ namespace SdbTools.Writers;
 public static class SdbuWriter
 {
     private const string MagicNumber = "sdbu";
-    private const byte HeaderLength = 42;
-    private const byte SignalBodyLength = 48;
+    private const byte HeaderLength = 50;
+    private const byte SignalBodyLength = 56;
 
     public static void Write(string outputPath, SdbuProject project)
     {
@@ -21,6 +21,8 @@ public static class SdbuWriter
         bw.Write(HeaderLength);
         bw.Write(SignalBodyLength);
         bw.Write(project.Protocol.ProtocolConfig);
+        bw.Write(project.Protocol.HeaderMagic);
+        bw.Write(project.Protocol.FooterMagic);
         bw.Write((ushort)0);
 
         var allSignals = new List<SdbuSignal>();
@@ -54,8 +56,8 @@ public static class SdbuWriter
         var data = ms.ToArray();
 
         ushort crc = Crc16(data, HeaderLength, data.Length - HeaderLength);
-        data[38] = (byte)(crc & 0xFF);
-        data[39] = (byte)((crc >> 8) & 0xFF);
+        data[48] = (byte)(crc & 0xFF);
+        data[49] = (byte)((crc >> 8) & 0xFF);
 
         File.WriteAllBytes(outputPath, data);
     }

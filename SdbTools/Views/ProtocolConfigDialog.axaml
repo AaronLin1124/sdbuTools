@@ -19,6 +19,13 @@
             <Button Content="- 删除" Click="OnDeleteField" Width="70"/>
         </StackPanel>
 
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,0,0,10">
+            <TextBlock Text="包头特征码:" VerticalAlignment="Center" Width="100"/>
+            <TextBox x:Name="HeaderMagicBox" Width="150" Watermark="如: EA 16 00 00"/>
+            <TextBlock Text="包尾特征码:" VerticalAlignment="Center" Width="100" Margin="20,0,0,0"/>
+            <TextBox x:Name="FooterMagicBox" Width="150" Watermark="如: 0D 0A 00 00"/>
+        </StackPanel>
+
         <ScrollViewer>
             <StackPanel>
                 <TextBlock Text="字段顺序配置" FontWeight="Bold" Margin="0,0,0,5"/>

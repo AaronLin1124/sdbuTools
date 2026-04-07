@@ -74,6 +74,8 @@ public class SdbuMessage
 public class ProtocolFrame
 {
     public byte[] ProtocolConfig { get; set; } = new byte[32];
+    public byte[] HeaderMagic { get; set; } = new byte[4];
+    public byte[] FooterMagic { get; set; } = new byte[4];
 }
 
 public class SdbuProject

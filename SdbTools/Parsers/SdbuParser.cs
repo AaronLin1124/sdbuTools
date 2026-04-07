@@ -15,7 +15,7 @@ public static class SdbuParser
         var project = new SdbuProject { FilePath = filePath };
         var data = File.ReadAllBytes(filePath);
 
-        if (data.Length < 42)
+        if (data.Length < 50)
             throw new InvalidDataException("File too short");
 
         var magic = Encoding.ASCII.GetString(data, 0, 4);
@@ -27,11 +27,17 @@ public static class SdbuParser
         
         project.Protocol.ProtocolConfig = new byte[32];
         Array.Copy(data, 6, project.Protocol.ProtocolConfig, 0, 32);
+        
+        project.Protocol.HeaderMagic = new byte[4];
+        Array.Copy(data, 38, project.Protocol.HeaderMagic, 0, 4);
+        
+        project.Protocol.FooterMagic = new byte[4];
+        Array.Copy(data, 42, project.Protocol.FooterMagic, 0, 4);
 
-        ushort storedCrc = BitConverter.ToUInt16(data, 38);
-        ushort signalCount = BitConverter.ToUInt16(data, 40);
+        ushort storedCrc = BitConverter.ToUInt16(data, 46);
+        ushort signalCount = BitConverter.ToUInt16(data, 48);
 
-        ushort computedCrc = Crc16(data, 42, data.Length - 42);
+        ushort computedCrc = Crc16(data, 50, data.Length - 50);
         if (storedCrc != computedCrc)
             throw new InvalidDataException($"CRC mismatch: expected 0x{storedCrc:X}, got 0x{computedCrc:X}");
 

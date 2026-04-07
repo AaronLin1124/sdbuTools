@@ -49,18 +49,20 @@ SDBU (Signal Database for UART) 是一种用于串口协议信号定义的二进
 
 ## 6. 文件结构
 
-### 6.1 文件头 (42字节)
+### 6.1 文件头 (50字节)
 
 | 偏移 | 长度 | 字段 | 说明 |
 |------|------|------|------|
 | 0 | 4 | Magic | 文件标识，"sdbu" |
-| 4 | 1 | HeaderLength | 文件头长度 (42) |
-| 5 | 1 | SignalBodyLength | 信号体长度 (48) |
-| 6 | 32 | ProtocolConfig | 协议配置，每位置2字节，格式: [类型4bit \| 长度4bit \| 校验1bit \| 含长1bit \| Intel1bit \| 预留3bit] |
-| 38 | 2 | CRC16 | 文件CRC16校验 |
-| 40 | 2 | SignalCount | 信号数量 |
+| 4 | 1 | HeaderLength | 文件头长度 (50) |
+| 5 | 1 | SignalBodyLength | 信号体长度 (56) |
+| 6 | 32 | ProtocolConfig | 协议配置，每位置2字节 |
+| 38 | 4 | HeaderMagic | 包头特征码 (如 0xEA16) |
+| 42 | 4 | FooterMagic | 包尾特征码 (如 0x0D0A) |
+| 46 | 2 | CRC16 | 文件CRC16校验 |
+| 48 | 2 | SignalCount | 信号数量 |
 
-### 6.2 信号体 (48字节/个)
+### 6.2 信号体 (56字节/个)
 
 | 偏移 | 长度 | 字段 | 说明 |
 |------|------|------|------|

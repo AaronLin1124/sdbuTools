@@ -1,9 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using SdbTools.Models;
-using System.Collections.Generic;
-using System.Text;
 using Avalonia.Input;
+using SdbTools.Models;
 
 namespace SdbTools.Views;
 
@@ -19,12 +21,17 @@ public partial class ProtocolConfigDialog : Window
 
     public SdbuProject? Project { get; set; }
 
+    private TextBox? _headerMagicBox;
+    private TextBox? _footerMagicBox;
+
     public Dictionary<int, (int fieldType, int length, bool checkSum, bool inLength, bool byteOrder)> FieldConfigs { get; private set; } = new();
 
     public ProtocolConfigDialog()
     {
         InitializeComponent();
         GenerateFieldConfigs();
+        _headerMagicBox = this.Find<TextBox>("HeaderMagicBox");
+        _footerMagicBox = this.Find<TextBox>("FooterMagicBox");
     }
 
     public ProtocolConfigDialog(SdbuProject project) : this()
@@ -65,6 +72,26 @@ public partial class ProtocolConfigDialog : Window
                 _byteOrderChecks[i].IsChecked = byteOrder;
             }
         }
+
+        if (Project.Protocol.HeaderMagic != null)
+        {
+            _headerMagicBox!.Text = BytesToHexString(Project.Protocol.HeaderMagic);
+        }
+        if (Project.Protocol.FooterMagic != null)
+        {
+            _footerMagicBox!.Text = BytesToHexString(Project.Protocol.FooterMagic);
+        }
+    }
+
+    private string BytesToHexString(byte[] bytes)
+    {
+        var sb = new StringBuilder();
+        for (int i = 0; i < bytes.Length; i++)
+        {
+            if (i > 0) sb.Append(" ");
+            sb.Append(bytes[i].ToString("X2"));
+        }
+        return sb.ToString();
     }
 
     private void GenerateFieldConfigs()
@@ -83,7 +110,7 @@ public partial class ProtocolConfigDialog : Window
             (9, "包尾")
         };
 
-        for (int i = 0; i < _fieldCount; i++)
+        for (int i = 0; i < Initial_fieldCount; i++)
         {
             var panel = new StackPanel 
             { 
@@ -195,9 +222,26 @@ public partial class ProtocolConfigDialog : Window
         if (Project != null)
         {
             Project.Protocol.ProtocolConfig = protocolConfig;
+            Project.Protocol.HeaderMagic = HexStringToBytes(_headerMagicBox?.Text ?? "");
+            Project.Protocol.FooterMagic = HexStringToBytes(_footerMagicBox?.Text ?? "");
             Project.IsDirty = true;
         }
         Close();
+    }
+
+    private byte[] HexStringToBytes(string hex)
+    {
+        var bytes = new List<byte>();
+        var parts = hex.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        foreach (var part in parts)
+        {
+            if (part.Length == 2 && byte.TryParse(part, System.Globalization.NumberStyles.HexNumber, null, out var b))
+            {
+                bytes.Add(b);
+            }
+        }
+        while (bytes.Count < 4) bytes.Add(0);
+        return bytes.Take(4).ToArray();
     }
 
     private void OnCancel(object? sender, RoutedEventArgs e)
